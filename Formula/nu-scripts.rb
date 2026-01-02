@@ -18,17 +18,36 @@ class NuScripts < Formula
 
     autoload_lines = [
       "# Autoload nu_scripts aliases and completions.",
+      "# Only enable when the matching binary is available.",
       ""
     ]
 
+    autoload_entries = Hash.new { |hash, key| hash[key] = [] }
+
     alias_files.each do |file|
       relative_path = file.relative_path_from(pkgshare)
-      autoload_lines << "use \"#{opt_pkgshare}/#{relative_path}\" *"
+      command = file.basename.to_s.delete_suffix("-aliases.nu")
+      autoload_entries[command] << "use \"#{opt_pkgshare}/#{relative_path}\" *"
     end
 
-    (auto_generated_files + curated_files).each do |file|
+    auto_generated_files.each do |file|
       relative_path = file.relative_path_from(pkgshare)
-      autoload_lines << "use \"#{opt_pkgshare}/#{relative_path}\" *"
+      command = file.basename.to_s.delete_suffix(".nu")
+      autoload_entries[command] << "use \"#{opt_pkgshare}/#{relative_path}\" *"
+    end
+
+    curated_files.each do |file|
+      relative_path = file.relative_path_from(pkgshare)
+      command = file.basename.to_s.delete_suffix("-completions.nu")
+      autoload_entries[command] << "use \"#{opt_pkgshare}/#{relative_path}\" *"
+    end
+
+    autoload_entries.sort.each do |command, entries|
+      autoload_lines << "if (which \"#{command}\" | is-not-empty) {"
+      entries.each do |entry|
+        autoload_lines << "  #{entry}"
+      end
+      autoload_lines << "}"
     end
 
     (autoload_dir/"nu_scripts.nu").write(autoload_lines.join("\n").concat("\n"))
