@@ -11,36 +11,22 @@ class NuScripts < Formula
 
     autoload_dir = share/"nushell/vendor/autoload"
     autoload_dir.mkpath
-    (autoload_dir/"nu_scripts.nu").write <<~EOS
-      # Autoload nu_scripts aliases and completions.
-      let repo_root = "#{opt_pkgshare}"
-      let aliases_dir = ($repo_root | path join "aliases")
-      let completions_dir = ($repo_root | path join "custom-completions")
 
-      let alias_files = (
-        glob ($aliases_dir | path join "**" "*-aliases.nu")
-        | sort
-      )
+    alias_files = (pkgshare/"aliases").glob("**/*-aliases.nu").sort
+    auto_generated_files = (pkgshare/"custom-completions/auto-generate/completions").glob("*.nu").sort
+    curated_files = (pkgshare/"custom-completions").glob("**/*-completions.nu").sort
 
-      # Load auto-generated completions first so curated ones override.
-      let auto_generated_files = (
-        glob ($completions_dir | path join "auto-generate" "completions" "*.nu")
-        | sort
-      )
+    autoload_lines = [
+      "# Autoload nu_scripts aliases and completions.",
+      ""
+    ]
 
-      let curated_files = (
-        glob ($completions_dir | path join "**" "*-completions.nu")
-        | sort
-      )
+    (alias_files + auto_generated_files + curated_files).each do |file|
+      relative_path = file.relative_path_from(pkgshare)
+      autoload_lines << "do --ignore-errors { source \"#{opt_pkgshare}/#{relative_path}\" }"
+    end
 
-      for file in $alias_files {
-        do --ignore-errors { source $file }
-      }
-
-      for file in ($auto_generated_files | append $curated_files) {
-        do --ignore-errors { source $file }
-      }
-    EOS
+    (autoload_dir/"nu_scripts.nu").write(autoload_lines.join("\n").concat("\n"))
   end
 
   def caveats
