@@ -1,0 +1,4 @@
+Error: 3 failed steps!
+brew style misilelab/h10
+brew readall --aliases --os=all --arch=all misilelab/h10
+brew audit --except=installed --tap=misilelab/h10

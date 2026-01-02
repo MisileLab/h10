@@ -1,9 +1,8 @@
 class NuScripts < Formula
   desc "Nushell community scripts, aliases, and completions"
   homepage "https://github.com/nushell/nu_scripts"
-  url "https://github.com/nushell/nu_scripts/archive/refs/heads/main.tar.gz"
-  sha256 :no_check
   license "MIT"
+  head "https://github.com/nushell/nu_scripts.git", branch: "main"
 
   depends_on "nushell"
 

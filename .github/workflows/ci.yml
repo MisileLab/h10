@@ -37,6 +37,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Tap repository with explicit URL
+        run: brew tap ${{ github.repository }} https://github.com/${{ github.repository }}
+
       - name: Run tap syntax check
         run: brew test-bot --only-tap-syntax --tap=${{ github.repository }}
 
