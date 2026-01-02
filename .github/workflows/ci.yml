@@ -32,6 +32,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: brew install-bundler-gems
 
+      - name: Configure git for authenticated GitHub taps
+        run: git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run tap syntax check
         run: brew test-bot --only-tap-syntax --tap=${{ github.repository }}
 
