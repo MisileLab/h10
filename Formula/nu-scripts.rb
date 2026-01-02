@@ -21,9 +21,14 @@ class NuScripts < Formula
       ""
     ]
 
-    (alias_files + auto_generated_files + curated_files).each do |file|
+    alias_files.each do |file|
       relative_path = file.relative_path_from(pkgshare)
-      autoload_lines << "do --ignore-errors { source \"#{opt_pkgshare}/#{relative_path}\" }"
+      autoload_lines << "use \"#{opt_pkgshare}/#{relative_path}\" *"
+    end
+
+    (auto_generated_files + curated_files).each do |file|
+      relative_path = file.relative_path_from(pkgshare)
+      autoload_lines << "use \"#{opt_pkgshare}/#{relative_path}\" *"
     end
 
     (autoload_dir/"nu_scripts.nu").write(autoload_lines.join("\n").concat("\n"))
