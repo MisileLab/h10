@@ -19,7 +19,7 @@ class NuScripts < Formula
     autoload_lines = [
       "# Autoload nu_scripts aliases and completions.",
       "# Only enable when the matching binary is available.",
-      ""
+      "",
     ]
 
     autoload_entries = Hash.new { |hash, key| hash[key] = [] }
